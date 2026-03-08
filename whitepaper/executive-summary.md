@@ -1,7 +1,22 @@
 # Executive Summary
 
-Agentic commerce introduces autonomous software agents that act on behalf of users, merchants, and financial institutions. This whitepaper proposes a mathematical model for these systems using game theory, mechanism design, and multi-agent optimization.
+Agentic commerce is the next operating layer of digital markets: autonomous software agents discover products, negotiate terms, route payments, and execute settlement with minimal human latency. For fintech and commerce leaders, this is not only an AI product opportunity but a market-structure transition.
 
-We model commerce as a strategic interaction among merchant, user, and bank agents under constraints such as trust, liquidity, regulation, and latency. The framework highlights how Nash equilibria can emerge in pricing, negotiation, and settlement protocols, and how properly designed mechanisms can improve efficiency, fairness, and resilience.
+This whitepaper presents a rigorous model for that transition. We frame commerce as a repeated strategic game among three core agent classes:
 
-The objective is to provide decision-makers and system architects with a rigorous foundation for building tokenized, interoperable, and governable AI-native marketplaces.
+- User agents that maximize utility, trust, and execution certainty.
+- Merchant agents that maximize margin, conversion quality, and lifetime value.
+- Bank and payment agents that maximize fee-adjusted returns under risk and compliance constraints.
+
+Our central argument is that outcomes in agentic markets are determined less by model accuracy alone and more by protocol design: fee curves, negotiation rules, identity requirements, settlement rails, dispute windows, and governance incentives. These elements shape strategy, and strategy determines equilibrium.
+
+The paper contributes:
+
+1. A formal non-cooperative game model for merchant-user-bank interactions.
+2. A practical mechanism-design lens for protocol-level optimization.
+3. A multi-agent optimization framework under real frictions: latency, fraud, liquidity, and regulation.
+4. Implementation and governance guidance for enterprise deployment.
+
+For regulators, this framework supports structured stress testing of protocol behavior under asymmetric information and adversarial strategy. For CTOs and product leaders, it provides measurable equilibrium KPIs: spread, acceptance latency, payment success rate, settlement finality, and risk-adjusted conversion.
+
+The strategic implication is clear: organizations that design incentive-compatible, auditable, and programmable transaction protocols will capture disproportionate value in AI-native commerce ecosystems.
