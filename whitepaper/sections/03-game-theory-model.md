@@ -1,125 +1,108 @@
 # 03. Game-Theory Model
 
-## 3.1 Strategic Setting
+## 3.1 Strategic setting
 
-We model agentic commerce as a repeated non-cooperative game among three principal agent classes:
+We model agentic commerce as a repeated non-cooperative game among three agent populations:
 
-- **User agents** \(i \in \mathcal{U}\), which optimize utility from product fit, price, privacy, and execution certainty.
-- **Merchant agents** \(j \in \mathcal{M}\), which optimize profit, inventory turnover, customer lifetime value, and fraud-adjusted conversion.
-- **Bank / payment agents** \(k \in \mathcal{B}\), which optimize fee revenue, risk-adjusted capital efficiency, and compliance outcomes.
+- U: user agents
+- M: merchant agents
+- B: bank/payment agents
 
-At each round \(t \in \{1,\dots,T\}\), agents select actions from strategy sets:
+At each round t = 1..T, each agent chooses an action from its strategy space.
 
-\[
- a_i^t \in A_i,\quad a_j^t \in A_j,\quad a_k^t \in A_k,
-\]
+- user action: a_u(t) in A_u
+- merchant action: a_m(t) in A_m
+- bank action: a_b(t) in A_b
 
-where action profiles include offer generation, counter-offer policy, identity proof level, payment rail selection, and settlement timing.
+Actions include offer generation, counter-offer policy, identity proof level, payment rail selection, and settlement timing.
 
-## 3.2 Information and Assumptions
+## 3.2 Assumptions
 
-To ground economic claims, we make explicit assumptions:
+We make explicit assumptions to ground economic claims:
 
-1. **Bounded rationality with learning:** agents are not globally optimal at each step but improve via online policy updates.
-2. **Asymmetric information:** user willingness-to-pay, merchant marginal cost, and bank risk models are private information.
-3. **Protocol constraints:** all interactions must satisfy latency \(\tau \le \tau_{max}\), compliance \(\mathcal{C}=1\), and solvency constraints.
-4. **Tokenized settlement optionality:** agents may choose fiat rails or programmable token rails with different costs and finality times.
+1. Bounded rationality: agents learn online and are not globally optimal each round.
+2. Asymmetric information: willingness-to-pay, marginal cost, and risk model internals are private.
+3. Feasibility constraints: latency, solvency, and compliance constraints must hold.
+4. Rail optionality: agents can choose fiat rails or tokenized rails with different costs and finality.
 
-This creates a Bayesian repeated game with protocol-level feasibility constraints.
+This is a repeated Bayesian game with protocol constraints.
 
-## 3.3 Stage Payoffs
+## 3.3 Stage payoff definitions
 
-For a single transaction opportunity, define user utility:
+For one transaction opportunity:
 
-\[
-U_i = v_i(q_j) - p - \lambda_i \cdot \text{delay} - \phi_i \cdot \text{data\_exposure} - \psi_i \cdot \text{failure\_risk},
-\]
+User payoff
 
-merchant payoff:
+    U = value_of_match - price - delay_cost - data_exposure_cost - execution_failure_cost
 
-\[
-\Pi_j = p - c_j(q_j) - f_k(r) - \eta_j \cdot \text{inventory\_risk} - \rho_j \cdot \text{chargeback\_risk},
-\]
+Merchant payoff
 
-and bank payoff:
+    P = price - production_cost - payment_fee - inventory_risk_cost - chargeback_risk_cost
 
-\[
-B_k = f_k(r) - \kappa_k \cdot \text{capital\_usage} - \gamma_k \cdot \text{default\_risk} - \omega_k \cdot \text{compliance\_penalty}.
-\]
+Bank/payment payoff
 
-Here \(p\) is final price, \(q_j\) is product-quality vector, and \(f_k(r)\) is the fee schedule under rail \(r\).
+    B = fee_revenue - capital_cost - default_risk_cost - compliance_penalty_cost
 
-## 3.4 Negotiation as an Alternating-Offer Game
+A transaction occurs when all participating agents satisfy participation and feasibility conditions.
 
-We represent price and terms discovery as a finite-horizon alternating-offer game:
+## 3.4 Negotiation game
 
-1. Merchant agent proposes \(o_1=(p_1, s_1)\), where \(s\) captures terms (delivery, refunds, warranties, token incentives).
-2. User agent accepts, rejects, or counters with \(o_2\).
-3. Bank agent can veto infeasible terms (e.g., AML/KYC violation, risk limit breach) or attach pricing adjustments.
+We represent negotiation as a finite alternating-offer game.
 
-With discount factors \(\delta_u, \delta_m \in (0,1)\), equilibrium accepted terms satisfy the reservation constraints:
+1. Merchant proposes offer o1 = (price, terms).
+2. User accepts, rejects, or counters with o2.
+3. Bank/payment agent can reprice, approve, or veto based on risk and policy.
 
-\[
-U_i(o^*) \ge \bar U_i, \qquad \Pi_j(o^*) \ge \bar \Pi_j,
-\]
+Acceptance requires:
 
-subject to bank feasibility:
+- user payoff at accepted offer >= user reservation payoff
+- merchant payoff at accepted offer >= merchant reservation payoff
+- bank risk and compliance checks pass
 
-\[
-\Pr(\text{loss}\mid o^*) \le \ell_k^{max}, \qquad \mathcal{C}(o^*)=1.
-\]
+## 3.5 Nash equilibrium condition
 
-## 3.5 Nash Equilibrium and Market Behavior
+Let s = (s_u, s_m, s_b) be a strategy profile and J_n be expected utility for role n.
 
-Let \(s=(s_u,s_m,s_b)\) denote strategy profiles for user, merchant, and bank agents. A Nash equilibrium \(s^*\) satisfies:
+A Nash equilibrium s* satisfies:
 
-\[
-\forall n \in \{u,m,b\}:\quad J_n(s_n^*, s_{-n}^*) \ge J_n(s_n, s_{-n}^*)\quad \forall s_n \in S_n.
-\]
+    For each role n in {u, m, b}:
+    J_n(s*_n, s*_-n) >= J_n(s_n, s*_-n) for all feasible deviations s_n.
 
-In operational terms, equilibrium behavior implies:
+Operational interpretation:
 
-- users stop searching when expected surplus gain from additional negotiation is below search cost,
-- merchants stop conceding when marginal conversion benefit equals margin loss,
-- banks stop relaxing risk constraints when expected fee gain equals tail-risk cost.
+- users stop searching when expected surplus gain is below search cost,
+- merchants stop discounting when marginal conversion gain equals margin loss,
+- banks stop relaxing constraints when incremental fee gain equals tail-risk increase.
 
-This equilibrium perspective explains why poorly designed protocols can lock ecosystems into high-friction local equilibria (low conversion, high spread, slow settlement).
+## 3.6 Mechanism-design layer
 
-## 3.6 Mechanism-Design Layer
+Protocol designers choose parameters theta (fees, rebates, staking rules, dispute windows, trust weights) to maximize social objective W(theta):
 
-Because decentralized equilibria are not always welfare-maximizing, protocol designers choose mechanism parameters \(\theta\) (fee curves, rebate rules, staking requirements, dispute windows) to solve:
-
-\[
-\max_{\theta} \; W(\theta) = \sum_{i \in \mathcal{U}} U_i + \sum_{j \in \mathcal{M}} \Pi_j + \sum_{k \in \mathcal{B}} B_k,
-\]
+    W(theta) = sum(user payoffs) + sum(merchant payoffs) + sum(bank payoffs)
 
 subject to:
 
-- **incentive compatibility** (truthful revelation is optimal or approximately optimal),
-- **individual rationality** (all major participants weakly prefer participation),
-- **budget/risk balance** (no unbounded subsidy or unpriced risk transfer),
-- **regulatory admissibility** across jurisdictions.
+- incentive compatibility,
+- individual rationality,
+- risk-budget sustainability,
+- regulatory admissibility.
 
-This turns agentic commerce architecture into a mechanism-design problem, not just an AI orchestration problem.
+Therefore, market quality is a design problem, not only an inference problem.
 
-## 3.7 Repeated-Game Effects and Reputation
+## 3.7 Repeated-game and reputation effects
 
-Over repeated interactions, reputation \(R_n^t\) becomes a state variable affecting continuation value. Cooperative outcomes can be sustained when the discounted future penalty from defection exceeds one-shot gain:
+Let R_n(t) be reputation state for role n at time t.
 
-\[
-\text{Defect if } g_n^{one-shot} > \frac{\delta_n}{1-\delta_n} \cdot L_n^{future};
-\quad
-\text{otherwise cooperate.}
-\]
+Cooperation is sustainable when the discounted expected future penalty from defection exceeds short-term gain.
 
-Hence, verifiable reputation, auditable logs, and portable trust scores are mathematically central to stable long-run equilibria in agentic markets.
+Practical implication: verifiable logs, portable reputation, and transparent policy enforcement increase long-run cooperation and lower equilibrium friction.
 
-## 3.8 Implications for Fintech and Commerce
+## 3.8 Why this matters to industry
 
-For fintech leaders and CTOs, the model yields practical guidance:
+For fintech operators and CTOs, equilibrium thinking changes implementation priorities:
 
-- optimize **protocol parameters**, not only model accuracy,
-- measure **equilibrium KPIs** (spread, acceptance latency, settlement finality, risk-adjusted conversion),
-- treat governance as a **payoff-shaping mechanism** that changes strategic behavior.
+- optimize protocol incentives, not just model accuracy,
+- monitor equilibrium KPIs (spread, latency, finality, risk-adjusted conversion),
+- treat governance controls as payoff-shaping infrastructure.
 
-For regulators, it provides a structured basis for stress testing whether a proposed agentic protocol is likely to produce efficient, fair, and resilient equilibria under realistic information asymmetries.
+For regulators, the model supports ex-ante and ongoing stress tests of strategic failure modes.
